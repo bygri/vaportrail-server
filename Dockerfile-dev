@@ -1,0 +1,16 @@
+# docker build -t bygri/vaportrail-server:dev -f Dockerfile-dev . && docker run -it -p 80:80 --privileged -v "$PWD":/app bygri/vaportrail-server:dev
+
+FROM swift:4
+
+RUN apt-get -qq update && apt-get install -y apt-utils \
+  && echo debconf debconf/frontend select Noninteractive | debconf-set-selections \
+  && apt-get -q -y install \
+  tzdata \
+  mysql-server \
+  libmysqlclient-dev \
+  && rm -r /var/lib/apt/lists/*
+
+WORKDIR /app/
+
+ENTRYPOINT chown -R mysql:mysql /var/lib/mysql && service mysql start && echo "create database vaportrail_test" | mysql \
+  && bash
